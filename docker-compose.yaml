@@ -1,0 +1,26 @@
+
+services:
+  runner:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    working_dir: /learn
+    env_file:
+      - .env
+    network_mode: "host"
+    command: jupyter notebook --allow-root --ip=0.0.0.0 --port 8890
+    volumes:
+      - ".:/learn"
+#      - "/tmp/.X11-unix:/tmp/.X11-unix" # If you need to display something in X11
+#      - "~/.Xauthority:/root/.Xauthority"
+      - "/dev/dri:/dev/dri"
+      - "./huggingface_checkpoint:/root/.cache/huggingface" # we are saving checkpints in local folder not inside docker container
+      - "./torch_hub_checkpoints:/root/.cache/torch/" # same for torch checkpoints
+    ulimits:
+      rtprio: 95
+      memlock: -1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [ gpu ]
